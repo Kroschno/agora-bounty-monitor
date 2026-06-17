@@ -1,0 +1,42 @@
+name: bounty-monitor
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # alle 15 Min (UTC); GitHub kann unter Last verzögern
+  workflow_dispatch: {}        # manuell startbar
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bounty-monitor
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run monitor
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python monitor.py
+
+      - name: Persist state
+        run: |
+          git config user.name "bounty-bot"
+          git config user.email "bot@users.noreply.github.com"
+          # Heartbeat nur alle ~12h aktualisieren (haelt den Cron-Workflow wach)
+          if [ ! -f .heartbeat ] || [ $(( $(date +%s) - $(date -r .heartbeat +%s) )) -gt 43200 ]; then
+            date -u +%FT%TZ > .heartbeat
+          fi
+          git add -A
+          git commit -m "state $(date -u +%FT%TZ)" || echo "nichts zu committen"
+          git push || echo "push fehlgeschlagen (kein Konflikt erwartet)"

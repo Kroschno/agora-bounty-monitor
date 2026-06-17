@@ -1,0 +1,20 @@
+{
+  "languages": ["Python", "TypeScript"],
+  "min_amount": 50,
+  "max_amount": 350,
+  "include_unknown_amount": true,
+  "blocklist_repos": [
+    "claude-builders-bounty/claude-builders-bounty",
+    "xevrion-v2/agent-playground",
+    "UnsafeLabs/Bounty-Hunters",
+    "SecureBananaLabs/bug-bounty",
+    "Scottcjn/rustchain-bounties",
+    "ApexOpsStudio/ai-gitops-test-target",
+    "PG-AGI/toingg-jarvis",
+    "tine1117/oss-hunter-livefire"
+  ],
+  "blocklist_patterns": ["playground", "bug-bounty", "bounty-hunters", "test-target", "rustchain", "oss-hunter", "livefire"],
+  "email": {
+    "enabled": true
+  }
+}
